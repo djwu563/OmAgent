@@ -8,9 +8,9 @@ from pydantic import field_validator
 from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 from unitree_sdk2py.go2.video.video_client import VideoClient
 
-from ....utils.logger import logging
-from ....utils.registry import registry
-from ...base import ArgSchema, BaseTool
+from omagent_core.utils.logger import logging
+from omagent_core.utils.registry import registry
+from omagent_core.tool_system.base import ArgSchema, BaseTool
 
 CURRENT_PATH = Path(__file__).parents[0]
 

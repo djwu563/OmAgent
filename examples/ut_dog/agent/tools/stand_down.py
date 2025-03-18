@@ -11,9 +11,9 @@ from unitree_sdk2py.go2.sport.sport_client import (
     SPORT_PATH_POINT_SIZE,
 )
 
-from ....utils.logger import logging
-from ....utils.registry import registry
-from ...base import ArgSchema, BaseTool
+from omagent_core.utils.logger import logging
+from omagent_core.utils.registry import registry
+from omagent_core.tool_system.base import ArgSchema, BaseTool
 
 CURRENT_PATH = Path(__file__).parents[0]
 
@@ -22,8 +22,8 @@ ARGSCHEMA = {
 
 
 @registry.register_tool()
-class StandUp(BaseTool):
-    """Tool for making Unitree Go2 robot stand up. The robot stands up normally, with the joint motor locked. Compared to the balanced standing mode, this mode does not maintain a constant balance posture. The default standing height is 0.33m."""
+class StandDown(BaseTool):
+    """Tool for making Unitree Go2 robot stand down. The robot lies down, and the motor joints remain locked."""
 
     class Config:
         """Configuration for this pydantic object."""
@@ -32,7 +32,7 @@ class StandUp(BaseTool):
         arbitrary_types_allowed = True
 
     args_schema: ArgSchema = ArgSchema(**ARGSCHEMA)
-    description: str = "Control the Unitree Go2 robot to stand up. The robot stands up normally, with the joint motor locked. Compared to the balanced standing mode, this mode does not maintain a constant balance posture. The default standing height is 0.33m."
+    description: str = "Control the Unitree Go2 robot to stand down. The robot lies down, and the motor joints remain locked."
     network_interface_name: Optional[str]
 
     def __init__(self, **data: Any) -> None:
@@ -53,18 +53,22 @@ class StandUp(BaseTool):
         self
     ) -> Dict[str, Any]:
         """
-        Control the Go2 to stand up.
+        Control the Go2 to stand down.
         """
 
         try:
-            self.sport_client.StandUp()
+            self.sport_client.StandDown()
             return {
                 "code": 0,
                 "msg": "success",
             }
         except Exception as e:
-            logging.error(f"Stand up failed: {e}")
+            logging.error(f"Stand down failed: {e}")
             return {
                 "code": 500,
                 "msg": "failed",
             }
+
+if __name__ == "__main__":
+    tool = StandDown(network_interface_name="eth0")
+    tool.run()

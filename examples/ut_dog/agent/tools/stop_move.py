@@ -11,9 +11,9 @@ from unitree_sdk2py.go2.sport.sport_client import (
     SPORT_PATH_POINT_SIZE,
 )
 
-from ....utils.logger import logging
-from ....utils.registry import registry
-from ...base import ArgSchema, BaseTool
+from omagent_core.utils.logger import logging
+from omagent_core.utils.registry import registry
+from omagent_core.tool_system.base import ArgSchema, BaseTool
 
 CURRENT_PATH = Path(__file__).parents[0]
 
