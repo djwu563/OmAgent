@@ -20,17 +20,17 @@ CURRENT_PATH = Path(__file__).parents[0]
 ARGSCHEMA = {
     "vx": {
         "type": "float",
-        "description": "The distance moved in the x-axis direction per call, measured in meters (m). A positive value indicates movement forward, while a negative value indicates movement backward.",
+        "description": "Speed along the x-axis direction, in meters per second (m/s). Positive values indicate forward movement, and negative values indicate backward movement. Value range: [-2.5~3.8] m/s.",
         "required": False,
     },
     "vy": {
         "type": "float",
-        "description": "The distance moved in the y-axis direction per call, measured in meters (m). A positive value indicates movement to the left, while a negative value indicates movement to the right.",
+        "description": "Speed along the y-axis direction, in meters per second (m/s). Positive values indicate movement to the left, and negative values indicate movement to the right. Value range: [-1.0~1.0] m/s.",
         "required": False,
     },
     "vyaw": {
         "type": "float",
-        "description": "The angle rotated around the z-axis per call, measured in radians (rad). A positive value indicates clockwise rotation, while a negative value indicates counterclockwise rotation.",
+        "description": "Angular velocity around the z-axis, in radians per second (rad/s). Positive values indicate counterclockwise rotation, and negative values indicate clockwise rotation. Value range: [-4~4] rad/s.",
         "required": False,
     },
 }
