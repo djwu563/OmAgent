@@ -11,24 +11,19 @@ from unitree_sdk2py.go2.sport.sport_client import (
     SPORT_PATH_POINT_SIZE,
 )
 
-from ....utils.logger import logging
-from ....utils.registry import registry
-from ...base import ArgSchema, BaseTool
+from omagent_core.utils.logger import logging
+from omagent_core.utils.registry import registry
+from omagent_core.tool_system.base import ArgSchema, BaseTool
 
 CURRENT_PATH = Path(__file__).parents[0]
 
 ARGSCHEMA = {
-    "switch": {
-        "type": "bool",
-        "description": "switch to enable or disable free avoid.",
-        "required": True,
-    },
 }
 
 
 @registry.register_tool()
-class FreeAvoid(BaseTool):
-    """Tool for making Unitree Go2 robot to enable or disable free avoid."""
+class StandUp(BaseTool):
+    """Tool for making Unitree Go2 robot stand up. The robot stands up normally, with the joint motor locked. Compared to the balanced standing mode, this mode does not maintain a constant balance posture. The default standing height is 0.33m."""
 
     class Config:
         """Configuration for this pydantic object."""
@@ -37,7 +32,7 @@ class FreeAvoid(BaseTool):
         arbitrary_types_allowed = True
 
     args_schema: ArgSchema = ArgSchema(**ARGSCHEMA)
-    description: str = "Control the Unitree Go2 robot to enable or disable free avoid."
+    description: str = "Control the Unitree Go2 robot to stand up. The robot stands up normally, with the joint motor locked. Compared to the balanced standing mode, this mode does not maintain a constant balance posture. The default standing height is 0.33m."
     network_interface_name: Optional[str]
 
     def __init__(self, **data: Any) -> None:
@@ -55,21 +50,20 @@ class FreeAvoid(BaseTool):
         return network_interface_name
 
     def _run(
-        self,
-        switch: bool = True
+        self
     ) -> Dict[str, Any]:
         """
-        Control the Unitree Go2 robot to free avoid.
+        Control the Go2 to stand up.
         """
 
         try:
-            self.sport_client.FreeAvoid(switch)
+            self.sport_client.StandUp()
             return {
                 "code": 0,
                 "msg": "success",
             }
         except Exception as e:
-            logging.error(f"Free avoid failed: {e}")
+            logging.error(f"Stand up failed: {e}")
             return {
                 "code": 500,
                 "msg": "failed",
