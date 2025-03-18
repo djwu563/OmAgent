@@ -9,7 +9,7 @@ from .base import BaseLLM
 import torch
 import sysconfig
 import geocoder
-from qwen_vl_utils import process_vision_info
+
 
 BASIC_SYS_PROMPT = """You are an intelligent agent that can help in many regions. 
 Following are some basic information about your working environment, please try your best to answer the questions based on them if needed. 
@@ -30,7 +30,21 @@ class Qwen2_VL(BaseLLM):
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
-        from transformers import AutoTokenizer, AutoProcessor, Qwen2VLForConditionalGeneration
+        # try to import, install if not found
+        try:
+            from transformers import AutoTokenizer, AutoProcessor, Qwen2VLForConditionalGeneration
+        except ImportError:
+            print("transformers not found, installing...")
+            import subprocess
+            subprocess.check_call(["pip", "install", "transformers"])
+            from transformers import AutoTokenizer, AutoProcessor, Qwen2VLForConditionalGeneration
+        try:
+            from qwen_vl_utils import process_vision_info
+        except ImportError:
+            print("qwen_vl_utils not found, installing...")
+            import subprocess
+            subprocess.check_call(["pip", "install", "qwen_vl_utils"])
+            from qwen_vl_utils import process_vision_info
         self.processor = AutoProcessor.from_pretrained(self.model_name,min_pixels=256 * 28 * 28, max_pixels=512 * 28 * 28)
         self.model = Qwen2VLForConditionalGeneration.from_pretrained(self.model_name, torch_dtype="auto", device_map="auto").to(self.device)
         
