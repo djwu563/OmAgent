@@ -1,19 +1,11 @@
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
-
 from pydantic import field_validator
-from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelFactoryInitialize
-from unitree_sdk2py.idl.default import unitree_go_msg_dds__SportModeState_
-from unitree_sdk2py.idl.unitree_go.msg.dds_ import SportModeState_
-from unitree_sdk2py.go2.sport.sport_client import (
-    SportClient,
-    PathPoint,
-    SPORT_PATH_POINT_SIZE,
-)
 
 from omagent_core.utils.logger import logging
 from omagent_core.utils.registry import registry
 from omagent_core.tool_system.base import ArgSchema, BaseTool
+from .utils.channel_manager import ChannelFactoryManager
 
 CURRENT_PATH = Path(__file__).parents[0]
 
@@ -37,10 +29,8 @@ class StandDown(BaseTool):
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
-        ChannelFactoryInitialize(0, self.network_interface_name)
-        self.sport_client = SportClient()  
-        self.sport_client.SetTimeout(10.0)
-        self.sport_client.Init()
+        ChannelFactoryManager.initialize(0, self.network_interface_name)
+        self.sport_client = ChannelFactoryManager.get_sport_client()
 
     @field_validator("network_interface_name")
     @classmethod
@@ -57,9 +47,11 @@ class StandDown(BaseTool):
         """
 
         try:
-            self.sport_client.StandDown()
+            code = self.sport_client.StandDown()
+            if code != 0:
+                raise Exception(f"code: {code}")
             return {
-                "code": 0,
+                "code": code,
                 "msg": "success",
             }
         except Exception as e:
