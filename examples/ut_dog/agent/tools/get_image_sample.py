@@ -5,13 +5,12 @@ from typing import Any, Dict, Optional, Union
 import cv2
 import numpy as np
 from pydantic import field_validator
-from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 from unitree_sdk2py.go2.video.video_client import VideoClient
 
 from omagent_core.utils.logger import logging
 from omagent_core.utils.registry import registry
 from omagent_core.tool_system.base import ArgSchema, BaseTool
-
+from .utils.channel_manager import ChannelFactoryManager
 CURRENT_PATH = Path(__file__).parents[0]
 
 ARGSCHEMA = {
@@ -34,7 +33,7 @@ class GetImageSample(BaseTool):
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
-        ChannelFactoryInitialize(0, self.network_interface_name)
+        ChannelFactoryManager.initialize(0, self.network_interface_name)
         self.video_client = VideoClient()  
         self.video_client.SetTimeout(3.0)
         self.video_client.Init()
@@ -45,6 +44,15 @@ class GetImageSample(BaseTool):
         if network_interface_name == None:
             raise ValueError("network interface name is not provided.")
         return network_interface_name
+    
+    def take_shot(self):
+        code, data = self.video_client.GetImageSample()
+        if code != 0:
+            raise Exception(f"Get image sample failed: {code}")
+
+        image_array = np.frombuffer(bytes(data), np.uint8)
+        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)        
+        return image
 
     def _run(
         self,
@@ -54,12 +62,7 @@ class GetImageSample(BaseTool):
         """
 
         try:
-            code, data = self.video_client.GetImageSample()
-            if code != 0:
-                raise Exception(f"Get image sample failed: {data}")
-
-            image_array = np.frombuffer(bytes(data), np.uint8)
-            image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+            image = self.take_shot()
             cache_data = self.stm(self.workflow_instance_id)["image_cache"]
             if cache_data is None:
                 cache_data = {}
